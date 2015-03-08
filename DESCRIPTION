@@ -1,0 +1,20 @@
+Package: mplyr
+Type: Package
+Title: Matrix manipulation utilities
+Version: 0.1
+Date: 2015-03-04
+Author: Giuseppe A. Paleologo
+Maintainer: Giuseppe A. Paleologo <paleolobo@gmail.com>
+Description: The package provides functions for easier manipulation of
+    n-dimensional arrays (n <= 6): subsetting, aggregation, alignment,
+    accumulation. See README for more details.
+Depends:
+    zoo,
+    lazyeval,
+    gridExtra,
+    ggplot2,
+    reshape2,
+    dplyr,
+    magrittr,
+    testthat
+License: GPL v.2
