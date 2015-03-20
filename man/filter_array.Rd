@@ -2,20 +2,20 @@
 % Please edit documentation in R/cube.R
 \name{filter_array}
 \alias{filter_array}
-\title{selects a subset of a cube in a functional manner}
+\title{selects a subset of a array in a functional manner}
 \usage{
 filter_array(X, ...)
 }
 \arguments{
-\item{X}{cube}
+\item{X}{array}
 
 \item{...}{logical conditions}
 }
 \value{
-a cube
+a array
 }
 \description{
-selects a subset of a cube in a functional manner
+selects a subset of a array in a functional manner
 }
 \examples{
 X <- array(1:20, dim=c(4,5), dimnames=list(height=letters[1:4], width=letters[11:15]))

@@ -2,20 +2,20 @@
 % Please edit documentation in R/cube.R
 \name{overlay}
 \alias{overlay}
-\title{Overlays a cube on another}
+\title{Overlays a array on another}
 \usage{
 overlay(X, Y)
 }
 \arguments{
-\item{X}{cube}
+\item{X}{array}
 
-\item{Y}{cube}
+\item{Y}{array}
 }
 \value{
-cube
+array
 }
 \description{
-Given two cubes, the function: i) outer aligns them; replaces a NA value in the first one with the
+Given two arrays, the function: i) outer aligns them; replaces a NA value in the first one with the
 corresponding element of the second
 }
 

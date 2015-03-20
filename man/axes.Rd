@@ -7,7 +7,7 @@
 axes(X)
 }
 \arguments{
-\item{X}{cube}
+\item{X}{array}
 }
 \value{
 character vector

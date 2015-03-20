@@ -1,10 +1,10 @@
 
-#' Obtains a cube from a data frame
+#' Obtains an array from a data frame
 #' 
 #' @param X data frame
 #' @param id_var field 
 #' @param ... names of columns across which to aggregate
-#' @return a cube
+#' @return an array
 #' @export
 #' @examples df2c(iris, "Sepal.Length", "Species", "Petal.Width")
 #'           df2c(iris, Sepal.Length, Species, Petal.Width)
@@ -17,11 +17,12 @@ df2c <- function(data, FUN, id_var, ...){
   Y_names <- dimnames(Y)
   names(Y_names) <- axes
   dimnames(Y) <- Y_names
+  class(Y) <- c('array')
   Y
 }
 
-#' replacement function that sets axes names for a cube. The dimensions 
-#' of the cube must have names
+#' replacement function that sets axes names for a array. The dimensions 
+#' of the array must have names
 #'   
 #' @param value character vector, names of the exes   
 #' @return object with changed axes names
@@ -51,16 +52,16 @@ set_axes <- function(x, value){
 
 
 #' gets axes names
-#' @param X cube
+#' @param X array
 #' @return character vector
 #' @export
 axes <- function(X) names(dimnames(X))
  
-#' selects a subset of a cube in a functional manner
+#' selects a subset of a array in a functional manner
 #' 
-#' @param X cube
+#' @param X array
 #' @param ... logical conditions
-#' @return a cube
+#' @return a array
 #' @export
 #' @examples 
 #' X <- array(1:20, dim=c(4,5), dimnames=list(height=letters[1:4], width=letters[11:15]))
@@ -82,14 +83,14 @@ y <- do.call(`[`, c(list(X), dim_list, drop=FALSE))
 class(y) <- class(X)
 return(y)
 }   
-
+ 
 #' Aggregates the individual labels of one or more axes in order to summarize the cell contents
 #'
 #' @param X array
 #' @param ..., one or more functions of the form <axisname>= <expression of axisnames>
 #' @return an Array
 #' @export 
-groupby <- function(X, ...){
+groupby_array <- function(X, ...){
   .dimnames <- dimnames(X)
   .dots <- lazy_dots(...)
   dim_list <- X %>% 
@@ -102,8 +103,9 @@ groupby <- function(X, ...){
   return(X)
 }
  
+ 
 
-#' Aggregates a cube across the same values of a dimension
+#' Aggregates an array across the same values of a dimension
 #' 
 #' @param X array
 #' @param FUN function to apply to all elements in the array with same labels
@@ -117,7 +119,7 @@ groupby <- function(X, ...){
 #' X <- cuaxismutate(R, da
 #' te=function(x)substr(x, 1,7))
 #' X2 <- aggregate(X, mean)
-aggregate <- function(X, FUN, ...) {   #------***------
+aggregate_array <- function(X, FUN, ...) {  
   axis_groups <- attributes(X)$grouped_axes
   if (is.null(axis_groups)) {
     stop('Array must be grouped first.')
@@ -142,7 +144,7 @@ aggregate <- function(X, FUN, ...) {   #------***------
 #' 
 #' @author G.A.Paleologo  
 #' @export
-align <- function(X, all.dim = NULL, na.value = NA){
+align_array <- function(X, all.dim = NULL, na.value = NA){
   X_dims <- sapply(X, function(x) length(dim(x)))
   n_dims <- X_dims[1]
   stopifnot (n_dims <= 5)
@@ -187,21 +189,21 @@ align <- function(X, all.dim = NULL, na.value = NA){
 }
 
 
-#' Overlays a cube on another
+#' Overlays a array on another
 #' 
-#' Given two cubes, the function: i) outer aligns them; replaces a NA value in the first one with the 
+#' Given two arrays, the function: i) outer aligns them; replaces a NA value in the first one with the 
 #' corresponding element of the second
 #'
-#' @param X cube
-#' @param Y cube
-#' @return cube
+#' @param X array
+#' @param Y array
+#' @return array
 #' 
 #' @export
 overlay <- function(X, Y){
   X_n <- length(dim(X))
   Y_n <- length(dim(Y))
-  if (X_n != Y_n) stop('The two cubes must have the same number of dimensions.')
-  tmp <- align(list(X, Y), all.dim=rep(TRUE, X_n))
+  if (X_n != Y_n) stop('The two arrays must have the same number of dimensions.')
+  tmp <- align_array(list(X, Y), all.dim=rep(TRUE, X_n))
   OUT <- ifelse(is.na(tmp[[1]]), tmp[[2]], tmp[[1]])
   OUT
 }
@@ -290,13 +292,19 @@ join_all <- function(X){
   out    
 }  
 
+#' A simple array summary
+#'
+#' @param X array or matrix
+#' @return side effect: print some data about the array
+#' B
 #' @export
-summary_array <- function(X){
+summary.array <- function(X){
   X_first <- vapply(dimnames(X), head, '', n=1)
   X_last <- vapply(dimnames(X), tail, '', n=1)
   cat('type:\t', typeof(X), '\n')  
   cat(sprintf('%%NAs:\t%2.2f\n', sum(is.na(X))/length(X)*100))
   cat('-------------\n')
+  if (is.null(axes(X))) stop('The axes for the array have not been set.')
   X_dims <- data.frame(axis=axes(X), 
                        dim=dim(X),
                        first=X_first,
@@ -305,3 +313,6 @@ summary_array <- function(X){
   row.names(X_dims) <- NULL
   print(X_dims)
 }
+
+#' @export
+summary.matrix <- summary.array

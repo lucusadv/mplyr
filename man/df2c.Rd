@@ -2,7 +2,7 @@
 % Please edit documentation in R/cube.R
 \name{df2c}
 \alias{df2c}
-\title{Obtains a cube from a data frame}
+\title{Obtains an array from a data frame}
 \usage{
 df2c(data, FUN, id_var, ...)
 }
@@ -14,10 +14,10 @@ df2c(data, FUN, id_var, ...)
 \item{X}{data frame}
 }
 \value{
-a cube
+an array
 }
 \description{
-Obtains a cube from a data frame
+Obtains an array from a data frame
 }
 \examples{
 df2c(iris, "Sepal.Length", "Species", "Petal.Width")

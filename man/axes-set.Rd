@@ -2,8 +2,8 @@
 % Please edit documentation in R/cube.R
 \name{axes<-}
 \alias{axes<-}
-\title{replacement function that sets axes names for a cube. The dimensions
-of the cube must have names}
+\title{replacement function that sets axes names for a array. The dimensions
+of the array must have names}
 \usage{
 axes(x) <- value
 }
@@ -14,8 +14,8 @@ axes(x) <- value
 object with changed axes names
 }
 \description{
-replacement function that sets axes names for a cube. The dimensions
-of the cube must have names
+replacement function that sets axes names for a array. The dimensions
+of the array must have names
 }
 \examples{
 A <- array(1:10, dim=c(2,5), dimnames=list(letters[1:2], letters[11:15]))

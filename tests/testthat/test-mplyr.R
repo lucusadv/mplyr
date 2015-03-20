@@ -1,4 +1,5 @@
 library(Gmisc)
+library(mplyr)
 
 context("filtering")
 addNames <- function(x){
@@ -40,19 +41,19 @@ test_that("subsetting by one dimension", {
   A <- array(1:7300, dim=c(365,10,2), dimnames=list(date=format(as.Date('1970-01-01')+1:365), 
                                                     stock=toupper(letters[1:10]),
                                                     feature=paste0('Feat',1:2)))  %>% 
-    groupby(date = substr(date,1,7)) 
+    groupby_array(date = substr(date,1,7)) 
   
-  A2 <- aggregate(A, FUN=mean, na.rm=TRUE)
+  A2 <- aggregate_array(A, FUN=mean, na.rm=TRUE)
   expect_equal(A2['1970-01', 'A', 'Feat1'], 
                mean(A[grep('^1970-01', dimnames(A)[[1]]), 'A', 'Feat1']))
 })
 
 
-test_that("aggregate", {
+test_that("aggregate_array", {
   data(asset_returns)
   ret_test1 <- asset_returns %>% 
-    groupby(date=substr(date, 1, 7)) %>% 
-    aggregate(FUN=sum) %>%
+    groupby_array(date=substr(date, 1, 7)) %>% 
+    aggregate_array(FUN=sum) %>%
     filter_array(date='2007-02', id='000361105') %>%
     {.[,]}
   ret_test2 <- asset_returns[substr(row.names(asset_returns),1,7) == '2007-02', '000361105'] %>% sum
@@ -109,12 +110,12 @@ test_that("accumulate (sum) two matrices", {
 test_that("accumulate (sum) three arrays", { 
   X <- list(Titanic, Titanic, Titanic)
   tmp <- accumulate(X, all.dim = c(TRUE, TRUE, TRUE, TRUE), FUN =`+`, na.value = 0)
-  tmp2 <- align(list(tmp, 3*Titanic), all.dim = c(TRUE, TRUE, TRUE, TRUE))
+  tmp2 <- align_array(list(tmp, 3*Titanic), all.dim = c(TRUE, TRUE, TRUE, TRUE))
   expect_identical(tmp2[[1]], tmp2[[2]])
   
   X <- list(Titanic, Titanic, Titanic[-1,,,])
   tmp <- accumulate(X, all.dim = c(FALSE, TRUE, TRUE, TRUE), FUN =`+`, na.value = 0)
-  tmp2 <- align(list(tmp, 3*Titanic[-1,,,]), all.dim = c(FALSE, TRUE, TRUE, TRUE))
+  tmp2 <- align_array(list(tmp, 3*Titanic[-1,,,]), all.dim = c(FALSE, TRUE, TRUE, TRUE))
   expect_identical(tmp2[[1]], tmp2[[2]])  
 })
 
@@ -128,7 +129,7 @@ test_that("accumulate (multiply) three arrays", {
   dim3 <- Reduce(intersect, lapply(X, function(x) dimnames(x)[[3]]))
   A_expect <- A1[dim1, dim2, dim3] * A2[dim1, dim2, dim3] * A3[dim1, dim2, dim3]
   tmp <- accumulate(X, all.dim=c(FALSE, FALSE, FALSE), FUN =`*`, na.value = 1)
-  tmp2 <- align(list(tmp, A_expect), all.dim = c(TRUE, TRUE, TRUE))
+  tmp2 <- align_array(list(tmp, A_expect), all.dim = c(TRUE, TRUE, TRUE))
   expect_equal(tmp2[[1]], tmp2[[2]])
   
 })
@@ -174,9 +175,9 @@ test_that("subsetting by one dimension", {
   data(asset_returns)
   A <- asset_returns[1:5,1:5]
   B <- asset_returns[11:15,1:5]
-  tmp <- align(list(A, B), all.dim=c(FALSE, FALSE))
+  tmp <- align_array(list(A, B), all.dim=c(FALSE, FALSE))
   expect_equal(tmp[[1]],  tmp[[2]])
-  tmp <- align(list(A, B), all.dim=c(TRUE, FALSE))
+  tmp <- align_array(list(A, B), all.dim=c(TRUE, FALSE))
   expect_equal(tmp[[1]]['2007-01-03', '000360206'],  asset_returns['2007-01-03', '000360206'])
   expect_equal(tmp[[2]]['2007-01-03', '000360206'],  NA_real_)
   expect_equal(overlay(tmp[[1]], tmp[[2]]), asset_returns[c(1:5,11:15),1:5])
