@@ -14,7 +14,7 @@ as.array.data.frame <- function(data, FUN, id_var, ...){
   axes <- as.character(eval(substitute(alist(...))))
   v <- data[, id_var]
   w <- lapply(axes, function(x) as.character(data[, x]))
-  Y <- tapply(v, w, FUN, na.rm=TRUE)  
+  Y <- tapply(v, w, FUN)  
   Y_names <- dimnames(Y)
   names(Y_names) <- axes
   dimnames(Y) <- Y_names
