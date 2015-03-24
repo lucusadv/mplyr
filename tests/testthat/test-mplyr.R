@@ -1,13 +1,21 @@
 library(Gmisc)
 library(mplyr)
 
+context("conversion")
+test_that("From Data Frame to Array", {
+  expect_identical(as.array(iris, sum, "Sepal.Length", "Species", "Petal.Width"), 
+                   as.array(iris, sum,  Sepal.Length, Species, Petal.Width))
+  expect_identical(as.array(iris, sum, "Sepal.Length", "Species", "Petal.Width")['virginica', '2.2'],
+                   sum(iris[iris$Species=='virginica' & iris$Petal.Width==2.2, 'Sepal.Length']))
+})
+
+
 context("filtering")
 addNames <- function(x){
   dimnames(x) <- list(ROWS=paste('R', 1:nrow(x), sep=''),
                       COLUMNS=paste('C', 1:ncol(x), sep=''))
   x[order(row.names(x)), order(colnames(x))]
 }
-
 test_that("subsetting by one dimension", {
   nr <- 14
   nc <- 8
@@ -15,51 +23,54 @@ test_that("subsetting by one dimension", {
   A <- matrix(rnorm(nr*nc), nrow=nr, ncol=nc)
   A <- addNames(A)
   #  class(A) <- c('array','matrix')
-  expect_identical(filter_array(A, ROWS=ROWS %in% c('R1', 'R2')), 
+  expect_identical(filter(A, ROWS %in% c('R1', 'R2')), 
                    A[row.names(A) %in% c('R1', 'R2'),])
-  expect_identical(filter_array(A, ROWS=c('R1', 'R2')), 
+  expect_identical(filter(A, ROWS %in% c('R1', 'R2')), 
                    A[row.names(A) %in% c('R1', 'R2'),])
-  expect_identical(filter_array(A, COLUMNS=COLUMNS %in% c('C1', 'C8')), 
+  expect_identical(filter(A, COLUMNS %in% c('C1', 'C8')), 
                    A[,colnames(A) %in% c('C1', 'C8')])
-  expect_identical(filter_array(A, COLUMNS=c('C1', 'C8')), 
+  expect_identical(filter(A, COLUMNS %in% c('C1', 'C8')), 
                    A[,colnames(A) %in% c('C1', 'C8')])
-  expect_identical(filter_array(A, COLUMNS=COLUMNS =='C1'), 
+  expect_identical(filter(A, COLUMNS =='C1'), 
                    A[,colnames(A) == 'C1', drop=FALSE])
-  expect_identical(filter_array(A, COLUMNS='C1'), 
+  expect_identical(filter(A, COLUMNS=='C1'), 
                    A[,colnames(A) == 'C1', drop=FALSE])
   # on a table. Note that subsetting a table returns an array!
-  # we set the class back to table. filter_array() preserves (correctly) class
+  # we set the class back to table. filter() preserves (correctly) class
   b1 <- structure(HairEyeColor[dimnames(HairEyeColor)[[1]] >= 'Brown',,], class='table')
-  b2 <- filter_array(HairEyeColor, Hair = Hair >= 'Brown')
+  b2 <- filter(HairEyeColor, Hair >= 'Brown')
   expect_equal(b1, b2)
 })
 
+test_that("standard/nonstandard evaluation", {
+  b1 <- filter(HairEyeColor, Hair >= 'Brown')
+  b2 <- filter_(HairEyeColor, ~ Hair >= 'Brown')
+  expect_equal(b1, b2)
+})  
 
-context("groupby and summarize")
+
+
+context("group by and aggregate")
 test_that("subsetting by one dimension", {
-  
   A <- array(1:7300, dim=c(365,10,2), dimnames=list(date=format(as.Date('1970-01-01')+1:365), 
                                                     stock=toupper(letters[1:10]),
                                                     feature=paste0('Feat',1:2)))  %>% 
-    groupby_array(date = substr(date,1,7)) 
-  
-  A2 <- aggregate_array(A, FUN=mean, na.rm=TRUE)
+    group_by(substr(date,1,7)) 
+  A2 <- aggregate(A, FUN=mean, na.rm=TRUE)
   expect_equal(A2['1970-01', 'A', 'Feat1'], 
                mean(A[grep('^1970-01', dimnames(A)[[1]]), 'A', 'Feat1']))
 })
 
 
-test_that("aggregate_array", {
+test_that("aggregate", {
   data(asset_returns)
   ret_test1 <- asset_returns %>% 
-    groupby_array(date=substr(date, 1, 7)) %>% 
-    aggregate_array(FUN=sum) %>%
-    filter_array(date='2007-02', id='000361105') %>%
+    group_by(substr(date, 1, 7)) %>% 
+    aggregate(FUN=sum) %>%
+    filter(date == '2007-02', id == '000361105') %>%
     {.[,]}
   ret_test2 <- asset_returns[substr(row.names(asset_returns),1,7) == '2007-02', '000361105'] %>% sum
   expect_equal(ret_test1, ret_test2)
-  
-  
 })
 
 context("join and accumulate")
@@ -171,7 +182,7 @@ test_that("accumulate (add) two matrices, with missing data", {
 })
 
 context("align and overlay")
-test_that("subsetting by one dimension", {
+test_that("align by one dimension", {
   data(asset_returns)
   A <- asset_returns[1:5,1:5]
   B <- asset_returns[11:15,1:5]

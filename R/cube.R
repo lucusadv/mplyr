@@ -6,18 +6,23 @@
 #' @param ... names of columns across which to aggregate
 #' @return an array
 #' @export
-#' @examples df2c(iris, "Sepal.Length", "Species", "Petal.Width")
-#'           df2c(iris, Sepal.Length, Species, Petal.Width)
-df2c <- function(data, FUN, id_var, ...){
+#' @examples 
+#' as.array(iris, sum, "Sepal.Length", "Species", "Petal.Width") 
+#' as.array(iris, sum,  Sepal.Length, Species, Petal.Width)
+as.array.data.frame <- function(data, FUN, id_var, ...){
   id_var <- as.character(eval(substitute(alist(id_var))))
   axes <- as.character(eval(substitute(alist(...))))
   v <- data[, id_var]
-  w <- lapply(axes, function(x) data[, x])
+  w <- lapply(axes, function(x) as.character(data[, x]))
   Y <- tapply(v, w, FUN, na.rm=TRUE)  
   Y_names <- dimnames(Y)
   names(Y_names) <- axes
   dimnames(Y) <- Y_names
-  class(Y) <- c('array')
+  if (length(dim(Y)) == 2){
+    class(Y) <- c('array', 'matrix')
+  } else {
+    class(Y) <- 'array'
+  }
   Y
 }
 
@@ -57,6 +62,69 @@ set_axes <- function(x, value){
 #' @export
 axes <- function(X) names(dimnames(X))
  
+
+#' string matcher
+#' 
+#' Given a character vector .data and a character vector match_string
+#' returns a character vector of the same length as x.
+#' The i-th element is the element in y that is a substring of
+#' the i-th element of x. If less than one or more than one,
+#' it produces an error. Internal use only
+#' 
+#' 
+#' @examples
+#' x <- c('a+b', 'a-d', 'c'); y <- c('b', 'c','d')
+#' find_names(x, y)
+#' x <- c('a+b', 'a-d', 'c'); y <- c('a', 'b', 'c', 'd')
+#' find_names(x, y)  # error: too many matches
+#' x <- c('a+b', 'a-d', 'c'); y <- c('x', 'y', 'z')
+#' find_names(x, y)  # error: no matches
+#' 
+find_names <- function(.data, match_string){
+  out <- structure(.data, names=.data)
+  for (x in .data) {
+    assigned <- FALSE
+    for (y in match_string) {
+      if (length(grep(y, x))) {
+        if (!assigned) {
+          assigned <- TRUE
+          out[[x]] <- y
+        } else {
+          stop('More than one axis name is present in expression ', x, ', leading to ambiguity.')
+        }
+      }
+    }
+    if (!assigned){
+      stop('No axis name is present in expression ', x, '.')
+    }
+  }
+  out
+}
+
+#' @export
+.filter_ <- function(X, .dots){ 
+  .dimnames <- dimnames(X)
+  dim_list <- X %>% 
+    dim %>% 
+    length %>% {rep(T, .)} %>% 
+    as.list %>%
+    set_names(names(.dimnames))
+  dim_list_override <- lazy_eval(.dots, .dimnames)
+  if(class(.dots) == 'lazy_dots'){
+    .dots_names <- vapply(.dots, function(x) deparse(x$expr), '')
+  } else {
+    warning('standard evaluation currently experimentally supported.')
+    dim_list_override <- list(dim_list_override)
+    .dots_names <- deparse(.dots) 
+  }
+  names(dim_list_override) <- find_names(.dots_names, axes(X))  
+  for (n in names(dim_list_override))
+    dim_list[[n]] <- dim_list_override[[n]]
+  y <- do.call(`[`, c(list(X), dim_list, drop=FALSE))
+  class(y) <- class(X)
+  return(y)
+}   
+
 #' selects a subset of a array in a functional manner
 #' 
 #' @param X array
@@ -65,61 +133,51 @@ axes <- function(X) names(dimnames(X))
 #' @export
 #' @examples 
 #' X <- array(1:20, dim=c(4,5), dimnames=list(height=letters[1:4], width=letters[11:15]))
-#' filter_array(X, height=height >= 'c')
-#' filter_array(Titanic, Age=Age=='Child', Class=Class %in% c('2nd','1st'))
-filter_array <- function(X, ...){ 
+#' class(X) <- 'array'
+#' filter(X, height >= 'c')
+#' filter(Titanic, Age=='Child', Class %in% c('2nd','1st'))
+filter_.array  <- function(X, ...)  .filter_(X, ...)
+
+#' @export
+filter_.matrix <- function(X, ...)  .filter_(X, ...)
+
+#' @export
+filter_.table  <- function(X, ...)  .filter_(X, ...)
+
+
+.group_by <- function(X, .dots, add = add){
   .dimnames <- dimnames(X)
-  .dots <- lazy_dots(...)
   dim_list <- X %>% 
-    dim %>% 
-    length %>% 
-    {rep(T, .)} %>% 
-    as.list %>%
-  set_names(names(.dimnames))
-dim_list_override <- lapply(.dots, function(x) lazy_eval(x, .dimnames))
-for (n in names(dim_list_override))
-  dim_list[[n]] <- dim_list_override[[n]]
-y <- do.call(`[`, c(list(X), dim_list, drop=FALSE))
-class(y) <- class(X)
-return(y)
-}   
- 
+    dim %>% length %>%{rep(T, .)} %>% as.list %>% set_names(names(.dimnames))
+# attributes(X)$grouped_axes <- lapply(.dots, function(x) lazy_eval(x, .dimnames))
+attributes(X)$grouped_axes <- lazy_eval(.dots, .dimnames)
+.dots_names <- vapply(.dots, function(x) deparse(x$expr), '')
+names(attributes(X)$grouped_axes) <- find_names(.dots_names, axes(X)) 
+return(X)
+}
+
+
 #' Aggregates the individual labels of one or more axes in order to summarize the cell contents
 #'
 #' @param X array
 #' @param ..., one or more functions of the form <axisname>= <expression of axisnames>
 #' @return an Array
 #' @export 
-groupby_array <- function(X, ...){
-  .dimnames <- dimnames(X)
-  .dots <- lazy_dots(...)
-  dim_list <- X %>% 
-    dim %>% 
-    length %>% 
-    {rep(T, .)} %>% 
-    as.list %>%
-    set_names(names(.dimnames))
-  attributes(X)$grouped_axes <- lapply(.dots, function(x) lazy_eval(x, .dimnames))
-  return(X)
-}
- 
- 
+group_by_.array <- function(X, .dots, add = add) .group_by(X, .dots, add = add)
+#' @export 
+group_by_.matrix <- function(X, .dots, add = add) .group_by(X, .dots, add = add)
+#' @export 
+group_by_.table <- function(X, .dots, add = add) .group_by(X, .dots, add = add)
 
-#' Aggregates an array across the same values of a dimension
+ #' Aggregates an array across the same values of a dimension
 #' 
 #' @param X array
 #' @param FUN function to apply to all elements in the array with same labels
 #' across all axes. In order to obtain reliable results, it is strongly recommended
 #' that the function output be independent of the permutation of its arguments
 #' @param ... additional parameters to pass to FUN
-#' @export
-#' @examples
-#' R <- getTotrets()
-#' axes(R) <- c('date','id')
-#' X <- cuaxismutate(R, da
-#' te=function(x)substr(x, 1,7))
-#' X2 <- aggregate(X, mean)
-aggregate_array <- function(X, FUN, ...) {  
+#' @export 
+aggregate.array <- function(X, FUN, ...) {  
   axis_groups <- attributes(X)$grouped_axes
   if (is.null(axis_groups)) {
     stop('Array must be grouped first.')
@@ -133,7 +191,21 @@ aggregate_array <- function(X, FUN, ...) {
   axes(Y) <- axes(X)
   return(Y)
 }
- 
+
+#' @export
+aggregate.matrix <-  function(X, FUN, ...) aggregate.array(X, FUN, ...)
+
+#' @export
+aggregate.table <-  function(X, FUN, ...) aggregate.table(X, FUN, ...)
+
+
+all_identical <- function(.data){
+  x <- rep(F, length(.data)-1)
+  for (i in 2:length(.data)){
+    x[i-1] <- all(.data[[i-1]] == .data[[i]])    
+  }  
+  all(x)
+}
 
 #' align a list of arrays
 #'
