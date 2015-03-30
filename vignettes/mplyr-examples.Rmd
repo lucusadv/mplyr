@@ -20,7 +20,7 @@ B  <- as.array(diamonds, mean, x, clarity, cut, color)
 A
 ```
 and there is a summary function for arrays.
-...{r}
+```{r}
 summary(A)
 summary(B)
 ```
