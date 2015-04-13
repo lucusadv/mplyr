@@ -368,7 +368,6 @@ join_all <- function(X){
 #'
 #' @param X array or matrix
 #' @return side effect: print some data about the array
-#' B
 #' @export
 summary.array <- function(X){
   X_first <- vapply(dimnames(X), head, '', n=1)
@@ -388,3 +387,22 @@ summary.array <- function(X){
 
 #' @export
 summary.matrix <- summary.array
+
+#' Permutes dimensions by setting a giving a vector of axes in a different order
+#'
+#' @param X array or matrix
+#' @param newaxes chararacter vector, axes names of X, but in a different order
+#' @return array
+#' @export 
+axis_permute <- function(X, newaxes){
+  axes_X <- axes(X)
+  new_index <- rep(NA_integer_, length(axes(X)))
+  stopifnot(length(axes_X) == length(newaxes))
+  for (i in seq(newaxes)){
+    new_index[i] <- which(axes_X == newaxes[i])
+  }
+  stopifnot(all(!is.na(new_index)))
+  X %>% aperm(new_index)
+}  
+
+

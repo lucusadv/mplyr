@@ -11,7 +11,6 @@
 }
 \value{
 side effect: print some data about the array
-B
 }
 \description{
 A simple array summary
