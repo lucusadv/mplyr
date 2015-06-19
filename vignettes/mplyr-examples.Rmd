@@ -55,6 +55,7 @@ A %<>%
   aggregate(FUN=mean, na.rm=TRUE)
 summary(A)
 ```
+Note that group_by infers the dimension being split from the expression given as an argument; so `substr(date,1,7)` implies that the axis "date" is being split.
 ## Aligning
 Oftentime, two or more arrays are not aligned in that, while they may have the same number of dimensions (say 2-D matrices, 3-D arrays, up to dimension 5), they may have different sizes and/or misaligned labels. The function `align_array(list(X1, X2), all.dim=c(T,F), na.value=NA)` performs an alignment on a list of two or more arrays/matrices/tables. The alignment can be outer (on the union of each axis' labels) or inner (on their intersection). The axis names for the input arrays must be identical, and the dimension order must be the same. If not, you can change the order with `aperm` and change the axis names with `axis<-` or `set_axis`.
 ```{r}
@@ -68,8 +69,9 @@ Oftentime, two or more arrays are not aligned in that, while they may have the s
   bind[X3, X0] <- align_array(list(X3, X0), all.dim=c(T,T,T,T))
   table(X0 == X3)
 ```
-## Joining
-There is a also a joining function. In the case of arrays, an inner join would not be well defined unless an operation to operate on elements with overlapping indices. This is equivalent to the composition of an alignment and an element-wise function, and we prefer allowing the user compose these two primitives. For arrays with non-overlapping items, we have a join_all
+## Folding and Joining
+`accumulate` is a fold-like function operating on lists of arrays. There is no explicit initial argument.
+There is a also a joining function. In the case of arrays, an inner join would not be well defined unless an operation to operate on elements with overlapping indices. This is equivalent to the composition of an alignment and an element-wise function, and we prefer allowing the user compose these two primitives. For arrays with non-overlapping items, we have a `join_all`:
 ```{r}
   library(vadr)
   X0 <- structure(Titanic, class='array')

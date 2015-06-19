@@ -16,7 +16,8 @@ Depends:
     reshape2,
     dplyr,
     magrittr,
-    testthat
+    testthat,
+    Gmisc
 License: GPL v.2
 Suggests: knitr
 VignetteBuilder: knitr
