@@ -7,6 +7,8 @@
 set_axes(x, value)
 }
 \arguments{
+\item{x}{array object}
+
 \item{value}{character vector, names of the exes}
 }
 \value{

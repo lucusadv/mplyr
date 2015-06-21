@@ -10,7 +10,7 @@
 
 <meta name="author" content="Giuseppe Paleologo" />
 
-<meta name="date" content="2015-05-28" />
+<meta name="date" content="2015-06-20" />
 
 <title>mplyr</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">mplyr</h1>
 <h4 class="author"><em>Giuseppe Paleologo</em></h4>
-<h4 class="date"><em>2015-05-28</em></h4>
+<h4 class="date"><em>2015-06-20</em></h4>
 </div>
 
 
@@ -152,10 +152,7 @@ A %&lt;&gt;%<span class="st"> </span><span class="kw">set_axes</span>(<span clas
 ## 1    date  13 1970-01 ... 1971-01
 ## 2   stock  10       A ...       J
 ## 3 feature   2   Feat1 ...   Feat2</code></pre>
-</div>
-<div id="aligning" class="section level2">
-<h2>Aligning</h2>
-<p>Oftentime, two or more arrays are not aligned in that, while they may have the same number of dimensions (say 2-D matrices, 3-D arrays, up to dimension 5), they may have different sizes and/or misaligned labels. The function <code>align_array(list(X1, X2), all.dim=c(T,F), na.value=NA)</code> performs an alignment on a list of two or more arrays/matrices/tables. The alignment can be outer (on the union of each axis’ labels) or inner (on their intersection). The axis names for the input arrays must be identical, and the dimension order must be the same. If not, you can change the order with <code>aperm</code> and change the axis names with <code>axis&lt;-</code> or <code>set_axis</code>.</p>
+<p>Note that group_by infers the dimension being split from the expression given as an argument; so <code>substr(date,1,7)</code> implies that the axis “date” is being split. ## Aligning Oftentime, two or more arrays are not aligned in that, while they may have the same number of dimensions (say 2-D matrices, 3-D arrays, up to dimension 5), they may have different sizes and/or misaligned labels. The function <code>align_array(list(X1, X2), all.dim=c(T,F), na.value=NA)</code> performs an alignment on a list of two or more arrays/matrices/tables. The alignment can be outer (on the union of each axis’ labels) or inner (on their intersection). The axis names for the input arrays must be identical, and the dimension order must be the same. If not, you can change the order with <code>aperm</code> and change the axis names with <code>axis&lt;-</code> or <code>set_axis</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">  <span class="co"># we use vadr for unpacking</span>
   <span class="kw">library</span>(vadr)</code></pre>
 <pre><code>## Warning in .onLoad_macro(libname, pkgname): vadr does not support JIT
@@ -165,11 +162,7 @@ A %&lt;&gt;%<span class="st"> </span><span class="kw">set_axes</span>(<span clas
 ## 
 ## The following object is masked from 'package:dplyr':
 ## 
-##     chain
-## 
-## The following objects are masked from 'package:zoo':
-## 
-##     index, index&lt;-</code></pre>
+##     chain</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">  X0 &lt;-<span class="st"> </span><span class="kw">structure</span>(Titanic, <span class="dt">class=</span><span class="st">'array'</span>)
   X1 &lt;-<span class="st"> </span>X0[<span class="dv">1</span>:<span class="dv">2</span>,,,]
   X2 &lt;-<span class="st"> </span>X0[-(<span class="dv">1</span>:<span class="dv">2</span>),,,]
@@ -181,9 +174,9 @@ A %&lt;&gt;%<span class="st"> </span><span class="kw">set_axes</span>(<span clas
 ## TRUE 
 ##   32</code></pre>
 </div>
-<div id="joining" class="section level2">
-<h2>Joining</h2>
-<p>There is a also a joining function. In the case of arrays, an inner join would not be well defined unless an operation to operate on elements with overlapping indices. This is equivalent to the composition of an alignment and an element-wise function, and we prefer allowing the user compose these two primitives. For arrays with non-overlapping items, we have a join_all</p>
+<div id="folding-and-joining" class="section level2">
+<h2>Folding and Joining</h2>
+<p><code>accumulate</code> is a fold-like function operating on lists of arrays. There is no explicit initial argument. There is a also a joining function. In the case of arrays, an inner join would not be well defined unless an operation to operate on elements with overlapping indices. This is equivalent to the composition of an alignment and an element-wise function, and we prefer allowing the user compose these two primitives. For arrays with non-overlapping items, we have a <code>join_all</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">library</span>(vadr)
   X0 &lt;-<span class="st"> </span><span class="kw">structure</span>(Titanic, <span class="dt">class=</span><span class="st">'array'</span>)
   X1 &lt;-<span class="st"> </span>X0[<span class="dv">1</span>:<span class="dv">2</span>,,<span class="dv">1</span>,<span class="dv">1</span>]

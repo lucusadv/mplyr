@@ -1,6 +1,6 @@
 #' mplyr: Library for matrix manipulation 
 #'    
-#' @import reshape2 ggplot2 gridExtra dplyr magrittr zoo Gmisc
+#' @import lazyeval gridExtra ggplot2 reshape2 dplyr magrittr testthat Gmisc
 #' @docType package
 #' @name mplyr
 #' @author G.A.Paleologo 
