@@ -44,6 +44,7 @@ as.array.data.frame <- function(data, FUN, id_var, ...){
 
 #' function that sets axes names, to be used in a pipe
 #'   
+#' @param x array object
 #' @param value character vector, names of the exes   
 #' @return object with changed axes names
 #' @export
@@ -53,6 +54,27 @@ set_axes <- function(x, value){
   names(a) <- value
   dimnames(x) <- a
   return(x)
+}
+
+#' adds one or more dimensions, together with an axis name and a a value of the 
+#' coordinate
+#' 
+#' The dimension is added at the end. The array goes from dimension (m x n x p) 
+#' to (m x n x p x 1).
+#' 
+#' @param x array object
+#' @param value character with variable argument. add_axes(x, height=subject1)
+#'   is allowed.
+#' @return array object with changed axes names
+#' @examples x2 <- add_axes(Titanic, shipname='titanic')
+#' @export
+add_axes <- function(x, ...){
+  v <- list(...)
+  new_dimnames <- c(dimnames(x), v)
+  new_dim  <- c(dim(x), rep(1, length(v)))
+  dim(x) <- new_dim
+  dimnames(x) <- new_dimnames
+  x
 }
 
 
@@ -219,7 +241,7 @@ all_identical <- function(.data){
 align_array <- function(X, all.dim = NULL, na.value = NA){
   X_dims <- sapply(X, function(x) length(dim(x)))
   n_dims <- X_dims[1]
-  stopifnot (n_dims <= 5)
+  stopifnot (n_dims <= 6)
   stopifnot(length(all.dim)==n_dims)
   X_dimnames <- lapply(X, dimnames)
   X_axisnames <- lapply(X, axes)
@@ -248,10 +270,15 @@ align_array <- function(X, all.dim = NULL, na.value = NA){
       temp[,,,] <- Y[,,,]
       temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]]] <- 
         X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], drop=FALSE]
-    } else {
+    } else  if (n_dims == 5){
       temp[,,,,] <- Y[,,,,]
       temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]]] <- 
         X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]], drop=FALSE]
+    } else {
+      temp[,,,,,] <- Y[,,,,,]
+      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]], , ind[[6]]] <- 
+        X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]], ind[[6]], drop=FALSE]
+      
     } 
     out[[n]] <- temp
     axes(out[[n]]) <- X_axisnames[[n]]
@@ -296,7 +323,7 @@ accumulate <- function(X, all.dim = NULL, FUN =`+`, na.value = 0, ...){
   stopifnot(all_identical(X_axisnames))
   X_dims <- sapply(X, function(x) length(dim(x)))
   n_dims <- X_dims[1]
-  stopifnot (n_dims <= 5)
+  stopifnot (n_dims <= 6)
   stopifnot(length(all.dim)==n_dims)
   X_dimnames <- lapply(X, dimnames)
   opdims <- lapply(all.dim, function(x) if(x) union else intersect)    
@@ -313,21 +340,30 @@ accumulate <- function(X, all.dim = NULL, FUN =`+`, na.value = 0, ...){
     #   
     if (n_dims == 2){
       temp[,] <- Y[,]
-      temp[ind[[1]], ind[[2]]] <- X[[n]][ind[[1]], ind[[2]]]
+      temp[ind[[1]], ind[[2]]] <- 
+        X[[n]][ind[[1]], ind[[2]]]
       out <- FUN(out, temp, ...)
     } else if (n_dims == 3){
       temp[,,] <- Y[,,]
-      temp[ind[[1]], ind[[2]], ind[[3]]] <- X[[n]][ind[[1]], ind[[2]], ind[[3]]]
+      temp[ind[[1]], ind[[2]], ind[[3]]] <- 
+        X[[n]][ind[[1]], ind[[2]], ind[[3]]]
       out <- FUN(out, temp, ...)
     } else if (n_dims == 4){
       temp[,,,] <- Y[,,,]
-      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]]] <- X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]]]
+      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]]] <- 
+        X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]]]
+      out <- FUN(out, temp, ...)
+    } else if (n_dims == 5){
+      temp[,,,,] <- Y[,,,,]
+      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]]] <- 
+        X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]]]
       out <- FUN(out, temp, ...)
     } else {
-      temp[,,,,] <- Y[,,,,]
-      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]]] <- X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]]]
+      temp[,,,,,] <- Y[,,,,,]
+      temp[ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]], ind[[6]]] <- 
+        X[[n]][ind[[1]], ind[[2]], ind[[3]], ind[[4]], ind[[5]], ind[[6]]]
       out <- FUN(out, temp, ...)
-    } 
+    }
   }
   if (!is.null(X_axisnames[[1]])) axes(out) <- X_axisnames[[1]]
   out
@@ -394,7 +430,7 @@ summary.matrix <- summary.array
 #' @param newaxes chararacter vector, axes names of X, but in a different order
 #' @return array
 #' @export 
-axis_permute <- function(X, newaxes){
+permute_axis <- function(X, newaxes){
   axes_X <- axes(X)
   new_index <- rep(NA_integer_, length(axes(X)))
   stopifnot(length(axes_X) == length(newaxes))
@@ -405,4 +441,18 @@ axis_permute <- function(X, newaxes){
   X %>% aperm(new_index)
 }  
 
+#' Rename one or more axis
+#'
+#' @param X array or matrix
+#' @param ... named arguments, like oldaxisname = 'newaxisname'
+#' @return array
+#' @export 
+rename_axis <- function(X, ...){
+  v <- c(...)
+  X_axes <- X %>% 
+    axes %>% 
+    withNames
+  X_axes[match(names(v), X_axes)] <- v
+  set_axes(X, X_axes)
+}  
 
