@@ -238,14 +238,15 @@ all_identical <- function(.data){
 #' 
 #' @author G.A.Paleologo  
 #' @export
-align_array <- function(X, all.dim = NULL, na.value = NA){
+align_array <- function(X, all.dim, na.value = NA){
   X_dims <- sapply(X, function(x) length(dim(x)))
   n_dims <- X_dims[1]
   stopifnot (n_dims <= 6)
   stopifnot(length(all.dim)==n_dims)
   X_dimnames <- lapply(X, dimnames)
-  X_axisnames <- lapply(X, axes)
-  stopifnot(all_identical(X_axisnames))
+  X_axisnames <- lapply(X, axes) %>% 
+    ensure_that(any(sapply(is.null, .)), err_desc = 'some axis names are not set') %>%
+    ensure_that(all_identical(.), err_desc = 'Some axis names differ')
   opdims <- lapply(all.dim, function(x) if(x) union else intersect)   
   Y_dimnames <- list()
   for (i in seq(opdims)){

@@ -15,6 +15,7 @@ Depends:
     reshape2,
     dplyr,
     magrittr,
+    ensurer,
     testthat,
     Gmisc
 License: GPL v.2

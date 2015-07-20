@@ -4,7 +4,7 @@
 \alias{align_array}
 \title{align a list of arrays}
 \usage{
-align_array(X, all.dim = NULL, na.value = NA)
+align_array(X, all.dim, na.value = NA)
 }
 \arguments{
 \item{X}{list of arrays. Arrays must have the same number of dimensions (up to 5) but not the same size}
