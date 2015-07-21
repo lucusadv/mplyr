@@ -244,9 +244,11 @@ align_array <- function(X, all.dim, na.value = NA){
   stopifnot (n_dims <= 6)
   stopifnot(length(all.dim)==n_dims)
   X_dimnames <- lapply(X, dimnames)
-  X_axisnames <- lapply(X, axes) %>% 
-    ensure_that(any(sapply(is.null, .)), err_desc = 'some axis names are not set') %>%
+  X_axisnames <- lapply(X, axes) %>%
     ensure_that(all_identical(.), err_desc = 'Some axis names differ')
+  X_axisnames %>% vapply(function(x) all(!is.null(x)), FUN.VALUE = FALSE) %>% 
+    all %>%
+    ensure_that(. == TRUE, err_desc = 'some axis names are not set')
   opdims <- lapply(all.dim, function(x) if(x) union else intersect)   
   Y_dimnames <- list()
   for (i in seq(opdims)){
