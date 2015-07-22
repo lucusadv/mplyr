@@ -16,8 +16,7 @@ Depends:
     dplyr,
     magrittr,
     ensurer,
-    testthat,
-    Gmisc
+    testthat
 License: GPL v.2
 Suggests: knitr
 VignetteBuilder: knitr
