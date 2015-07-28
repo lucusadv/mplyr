@@ -2,7 +2,7 @@
 
 language: r
 warnings_are_errors: false
-sudo: required
+sudo: false
 
 install:
   ## For a CRAN package
