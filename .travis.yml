@@ -1,10 +1,15 @@
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
+# Sample .travis.yml for R projects
 
 language: r
-
+warnings_are_errors: false
 sudo: required
 
-warnings_are_errors=FALSE
+install:
+  ## For a CRAN package
+   - ./travis-tool.sh install_deps
+env:
+ global:
+   - CRAN: http://cran.rstudio.com
 
 notifications:
   email:
