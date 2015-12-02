@@ -132,6 +132,16 @@ symmsetdiff <- function(x, y){
 #' 
 `%nin%` <- function(x,y) !(x %in% y)
 
+#' @title returns logical vector if elements of first vector are not in second
+#' vector
+#' 
+#' @param x vector
+#' @param y vector
+#' @return logical vector
+#' @export
+#' 
+notin <- function(x,y) !(x %in% y)
+
 #' converts a matrix into a data frame  
 #' 
 #' converts a matrix into a data frame by adding a first
