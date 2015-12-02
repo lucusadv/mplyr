@@ -8,7 +8,7 @@ Maintainer: Giuseppe A. Paleologo <paleologo@gmail.com>
 Description: The package provides functions for easier manipulation of
     n-dimensional arrays (n <= 6): subsetting, aggregation, alignment,
     accumulation. See README for more details.
-Imports: 
+Imports:
     lazyeval,
     gridExtra,
     ggplot2,
@@ -18,5 +18,7 @@ Imports:
     ensurer,
     testthat
 License: GPL v.2
-Suggests: knitr
+Suggests:
+    knitr
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
