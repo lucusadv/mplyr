@@ -17,7 +17,8 @@ timeit <- function(f){
 #'
 #' @param x vector
 #' @return a vector with names equal to its elements 
-#' @author G.A.Paleologo  
+#' @author G.A.Paleologo
+#' @export 
 #' 
 withNames <- function(x){
   names(x) <- x
