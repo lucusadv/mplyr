@@ -117,7 +117,8 @@ munion <- function(...){
 #' @return a vector/set equal to the symmetricsetdifference of the input sets
 #'
 #' @author G.A.Paleologo 
-#' 
+#' @export
+#'  
 symmsetdiff <- function(x, y){
   union(setdiff(x, y), setdiff(y, x))
 }
