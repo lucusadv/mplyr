@@ -23,6 +23,6 @@ cuts a character vector using a set of character values
  v <- letters[seq(2,length(letters),2)]
  cut(letters[1:10], v, 'right')
  cut(letters[1:10], v, 'left')
-  
+
 }
 
