@@ -2,8 +2,7 @@
 #' 
 #' @param f function
 #' @return a function. Identical to f, but prints execution time 
-#' @export
-#' 
+#' @export 
 timeit <- function(f){
   a <- deparse(substitute(f))
   function(...) {
@@ -19,8 +18,7 @@ timeit <- function(f){
 #' @param x vector
 #' @return a vector with names equal to its elements 
 #' @author G.A.Paleologo
-#' @export 
-#' 
+#' @export
 withNames <- function(x){
   names(x) <- x
   x
@@ -41,8 +39,7 @@ withNames <- function(x){
 #' @param x element
 #' @return an element of v 
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 succ <- function(x, v){
   stopifnot(sum(duplicated(v)) == 0)
   stopifnot(x %in% v)
@@ -60,8 +57,7 @@ succ <- function(x, v){
 #' @param x element
 #' @return an element of v 
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 prev <- function(x, v){
   stopifnot(sum(duplicated(v)) == 0)
   stopifnot(x %in% v)
@@ -80,8 +76,7 @@ prev <- function(x, v){
 #' @return a vector/set equal to the intersection of the input sets
 #'
 #' @author G.A.Paleologo
-#' @export
-#' 
+#' @export 
 mintersect <- function(...){
   Reduce(intersect, list(...))
 }
@@ -93,7 +88,7 @@ mintersect <- function(...){
 #' @return a vector/set equal to the symmetric set difference of the input sets
 #'
 #' @author G.A.Paleologo
-#' 
+#' @export
 symmsetdiff <- function(x, y){
   union(setdiff(x, y), setdiff(y, x))
 }
@@ -105,8 +100,7 @@ symmsetdiff <- function(x, y){
 #' @return a vector/set equal to the union of the input sets
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 munion <- function(...){
   Reduce(union, list(...))
 }
@@ -117,8 +111,7 @@ munion <- function(...){
 #' @return a vector/set equal to the symmetricsetdifference of the input sets
 #'
 #' @author G.A.Paleologo 
-#' @export
-#'  
+#' @export  
 symmsetdiff <- function(x, y){
   union(setdiff(x, y), setdiff(y, x))
 }
@@ -129,8 +122,7 @@ symmsetdiff <- function(x, y){
 #' @param x vector
 #' @param y vector
 #' @return you guessed it: a vector
-#' @export
-#' 
+#' @export 
 `%nin%` <- function(x,y) !(x %in% y)
 
 #' @title returns logical vector if elements of first vector are not in second
@@ -139,8 +131,7 @@ symmsetdiff <- function(x, y){
 #' @param x vector
 #' @param y vector
 #' @return logical vector
-#' @export
-#' 
+#' @export 
 notin <- function(x,y) !(x %in% y)
 
 #' converts a matrix into a data frame  
@@ -153,8 +144,7 @@ notin <- function(x,y) !(x %in% y)
 #' @return a data frame 
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 m2df <- function(x, key = NA){
   stopifnot(is.matrix(x))  
   out_colnames <- c(key, colnames(x))
@@ -175,8 +165,7 @@ m2df <- function(x, key = NA){
 #' @return a matrix 
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 df2m <- function(x, key = NULL){
   stopifnot(is.data.frame(x)) 
   if (is.null(key)) {
@@ -204,8 +193,7 @@ df2m <- function(x, key = NULL){
 #' @return a matrix 
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 dt2m <- function(x, key = NULL){
   stopifnot(is.data.table(x)) 
   x <- as.data.frame(x)
@@ -218,8 +206,7 @@ dt2m <- function(x, key = NULL){
 #' @return numerical vector
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 m2v <- function(x){
   stopifnot(is.matrix(x) & ncol(x) == 1)
   structure(x[,], names=row.names(x))
@@ -231,8 +218,7 @@ m2v <- function(x){
 #' @return numerical vectors
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 df2v <- function(x){
   stopifnot(is.data.frame(x) & ncol(x) == 1)
   m2v(as.matrix(x))
@@ -245,8 +231,7 @@ df2v <- function(x){
 #' @return data.frame
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 v2df <- function(x, keys=c('V1', 'V2')){
   x <- data.frame(names(x), x, stringsAsFactors=FALSE)
   names(x) <- keys
@@ -263,8 +248,7 @@ v2df <- function(x, keys=c('V1', 'V2')){
 #' @return a ragged array
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 m2l <- function(x, by.row = TRUE){
   stopifnot(is.matrix(x))  
   if (by.row) x <- t(x)
@@ -282,8 +266,7 @@ m2l <- function(x, by.row = TRUE){
 #' @return a zoo object
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 m2zoo <- function(x, by.row = TRUE){
   stopifnot('matrix' %in% class(x))  
   if (!by.row) x <- t(x)
@@ -298,8 +281,7 @@ m2zoo <- function(x, by.row = TRUE){
 #' @return a matrix
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 l2m <- function(x, by.row = TRUE){  
   stopifnot('list' %in% class(x))  
   x_names <- lapply(x, names)
@@ -323,8 +305,7 @@ l2m <- function(x, by.row = TRUE){
 #' @return a matrix, equal to \code{diag(x) \%*\% Y} 
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 `%D*%` <- function(x, Y) {
   n <- nrow(Y)  
   for (i in 1:n){
@@ -341,8 +322,7 @@ l2m <- function(x, by.row = TRUE){
 #' @return a matrix, equal to \code{diag(x) \%*\% Y} 
 #'
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 `%*D%` <- function(Y, x) {
   n <- ncol(Y)  
   for (i in 1:n){
@@ -364,8 +344,7 @@ l2m <- function(x, by.row = TRUE){
 #' @note \code{opVectors} requires that vectors have names for their elements.
 #'
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 #' @examples 
 #' a <- b <- seq(letters)
 #' names(a) <- names(b) <- letters
@@ -399,8 +378,7 @@ opVectors <- function(x, y, all = FALSE, all.x = all,
 #' @param colnames character vector column names of the first column
 #' @return a data frame 
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 flattenList <- function(x, colnames=NULL){
   x <- unlist(x)
   x_names <- sapply(names(x), strsplit, split='\\.') 
@@ -420,8 +398,7 @@ flattenList <- function(x, colnames=NULL){
 #'  in the names of a corresponding element of x
 #' @return a ragged array 
 #' @author G.A.Paleologo  
-#' @export
-#' 
+#' @export 
 subset.raggedarray <- function(x, v){
   tstamp_common <- intersect(names(x), names(v))
   x_class <- class(x)
@@ -439,8 +416,7 @@ subset.raggedarray <- function(x, v){
 #' @param x ragged array
 #' @return a matrix with the summary data 
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 summary.raggedarray <- function(x){
   out <- list()
   out[['length']] <- summary(sapply(x, length))
@@ -461,8 +437,7 @@ summary.raggedarray <- function(x){
 #' @param x list
 #' @return a boolean 
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 all_identical <- function(X){
   y <- TRUE
   for (i in 2:length(X)){
@@ -476,8 +451,7 @@ all_identical <- function(X){
 #' @param x list
 #' @return a boolean 
 #' @author G.A.Paleologo 
-#' @export
-#' 
+#' @export 
 all_equal <- function(X){
   y <- TRUE
   for (i in 2:length(X)){
@@ -491,8 +465,7 @@ all_equal <- function(X){
 #' @param x matrix
 #' @param memory integer, how long missing data should be carried forward?
 #' @return a matrix
-#' @export
-#' 
+#' @export 
 nalocf <- function(x, memory=72L){
   n <- nrow(x)
   missing_counter <- rep(0, ncol(x))
@@ -532,13 +505,10 @@ cut_character <- function(x, v, align=c('left', 'right')){
 #' 
 #' @param X vector
 #' @return vector
-#' @export
-#' 
+#' @export 
 #' @examples
 #' v <- letters[1:10]
 #' Reverse(v)
-#' 
-#' 
 
 Reverse <- function(X) X[length(X):1]
 
@@ -551,7 +521,6 @@ Reverse <- function(X) X[length(X):1]
 #' @param n number of trailing elements
 #' @return a list of vectors
 #' @export
-#' 
 avg_list <- function(x, n){
   stopifnot(n < length(x))
   Y <- list()
@@ -578,8 +547,6 @@ avg_list <- function(x, n){
 #'@param v object
 #'@return a list
 #'@export
-#'
-#'
 repl <- function(x, v){
   lapply(withNames(x), function(a) v)
 }
@@ -591,7 +558,6 @@ repl <- function(x, v){
 #' @return a plot
 #' @author G.A.Paleologo
 #' @export
-#' 
 MVTSPlot <- function(X, obs = c('rows','cols'), lowcol = 'red', highcol ='green'){
   # X is a matrix
   # X <- matrix(rnorm(300), ncol=50)
@@ -697,7 +663,6 @@ lapplyseq <- function(X, FUN, label=c('first','last'),...){
 #' @param X list, a list comprised of vectors coercible to numeric
 #' @return the function has only side effects
 #' @export
-#' 
 summary_raggedarray <- function(X){
   X <- l2m(X)
   summary_data <- data.frame(n_elements = nrow(X),
