@@ -1,4 +1,47 @@
+# Generic Lucus Gitignore #
+###########################
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+*.pyo
+
+# IDE files #
+#############
+nbproject
+.~lock.*
+.buildpath
+.idea
+.idea/
+.project
+.settings
+composer.lock
+*.~
+
+# Logs and databases #
+######################
+*.log
+
+# OS generated files #
+######################
+Thumbs.db
+
+# GoDaddy Files  #
+##################
+.ftpquota
+.htpasswds/
+
+# R Files  #
+##################
 .Rproj.user
 .Rhistory
 .RData
+.Rproj.user
+*.Rd
 inst/doc
