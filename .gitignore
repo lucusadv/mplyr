@@ -45,3 +45,8 @@ Thumbs.db
 .Rproj.user
 *.Rd
 inst/doc
+
+# R Files - Roxygen #
+#####################
+DESCRIPTION
+NAMESPACE
