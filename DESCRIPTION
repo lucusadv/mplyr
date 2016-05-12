@@ -19,6 +19,7 @@ Imports:
     testthat
 License: GPL v.2
 Suggests:
-    knitr
-VignetteBuilder: knitr
+    knitr,
+    rmarkdown
+VignetteBuilder: rmarkdown
 RoxygenNote: 5.0.1
